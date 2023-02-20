@@ -1,0 +1,63 @@
+<?php
+include "main-module.php";
+/*$arr = get_defined_functions();
+$user_functions = array_values($arr["user"]);
+$create_functions = array();
+foreach($user_functions as $tempfunc){
+    if(str_contains($tempfunc, "create_")){
+        array_push($create_functions, $tempfunc);
+    }
+}
+print_r($create_functions);
+foreach($create_functions as $tempfunc){
+    print("<br />");
+    $refFunction = new ReflectionFunction($tempfunc);
+    print($tempfunc);
+    $parameters = $refFunction->getParameters();
+    print_r($parameters);
+    
+}
+*/
+
+?>
+<html>
+<body>
+<form method=GET>
+<select name="cruds" id="cruds">
+<?php
+foreach (glob("crud/*.php") as $filename) {
+    $firstcut = substr(strstr($filename, "/"), 1);
+    $finalcut = substr($firstcut, 0, -4);
+
+    print "<option value=$finalcut>".$finalcut."</option>";
+    //$refFunction = new ReflectionFunction("create_".$finalcut);
+    //$parameters = $refFunction->getParameters();
+    //print_r($parameters);
+    //print("<br />".preg);
+}
+?>
+</select>
+<input type="submit" />
+</form>
+<?php
+$i = 0;
+if(isset($_GET['cruds'])){
+    $refFunction = new ReflectionFunction("create_".$_GET['cruds']);
+    $parameters = $refFunction->getParameters();
+    echo "<form><table><input type=\"hidden\" name=\"update_table\" />";
+    echo "<input type=\"hidden\" name=\"function\" value=\"create_".$_GET['cruds']."\">";
+    foreach($parameters as $parameter){
+        $name = $parameter->name;
+        echo "<tr><td>".$name."</td><td><input name=\"item[".$i."]\" /></td></tr>";
+        $i++;
+    }
+    echo "</table><input type=\"submit\" /></form>";
+}
+if(isset($_GET['update_table'])){
+$refFunction = new ReflectionFunction($_GET['function']);
+
+echo "insert id: ".$refFunction->invokeArgs($_GET['item']);
+}
+?>
+</body>
+</html>
